@@ -35,6 +35,7 @@ jobs:
           repository: shemaobt/rfcs
           ref: main
           path: rfcs-source
+          token: ${{ secrets.GH_RFCS_READ_TOKEN }}
 
       - name: Prepare RFC content for Docker build context
         run: |
