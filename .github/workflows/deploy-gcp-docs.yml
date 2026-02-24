@@ -66,10 +66,24 @@ jobs:
       - name: Build and push container image
         run: |
           IMAGE_URI="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
-          gcloud builds submit . \
+          BUILD_ID="$(gcloud builds submit . \
             --tag "${IMAGE_URI}" \
-            --suppress-logs \
-            --project "${{ env.PROJECT_ID }}"
+            --project "${{ env.PROJECT_ID }}" \
+            --async \
+            --format='value(metadata.build.id)')"
+          echo "Started Cloud Build: ${BUILD_ID}"
+          while true; do
+            BUILD_STATUS="$(gcloud builds describe "${BUILD_ID}" --project "${{ env.PROJECT_ID }}" --format='value(status)')"
+            echo "Cloud Build status: ${BUILD_STATUS}"
+            if [ "${BUILD_STATUS}" = "SUCCESS" ]; then
+              break
+            fi
+            if [ "${BUILD_STATUS}" = "FAILURE" ] || [ "${BUILD_STATUS}" = "INTERNAL_ERROR" ] || [ "${BUILD_STATUS}" = "TIMEOUT" ] || [ "${BUILD_STATUS}" = "CANCELLED" ] || [ "${BUILD_STATUS}" = "EXPIRED" ]; then
+              echo "Cloud Build failed with status: ${BUILD_STATUS}"
+              exit 1
+            fi
+            sleep 10
+          done
           echo "IMAGE_URI=${IMAGE_URI}" >> "$GITHUB_ENV"
 
       - name: Deploy to Cloud Run
