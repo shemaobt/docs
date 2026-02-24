@@ -70,7 +70,7 @@ jobs:
             --tag "${IMAGE_URI}" \
             --project "${{ env.PROJECT_ID }}" \
             --async \
-            --format='value(metadata.build.id)')"
+            --format='value(id)')"
           echo "Started Cloud Build: ${BUILD_ID}"
           while true; do
             BUILD_STATUS="$(gcloud builds describe "${BUILD_ID}" --project "${{ env.PROJECT_ID }}" --format='value(status)')"
