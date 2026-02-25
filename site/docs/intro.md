@@ -1,47 +1,40 @@
 ---
 sidebar_position: 1
+title: Shema Documentation Hub
 ---
 
-# Tutorial Intro
+# Shema Documentation Hub
 
-Let's discover **Docusaurus in less than 5 minutes**.
+This Docs is the canonical entry point for Shema documentation.
 
-## Getting Started
+The goal is to document:
 
-Get started by **creating a new site**.
+- system-level architecture,
+- implementation and operational guides,
+- shared terminology,
+- and RFC decisions with historical context.
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+## What lives where
 
-### What you'll need
+Use this structure to keep docs easy to navigate:
 
-- [Node.js](https://nodejs.org/en/download/) version 20.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+- `Overview`: how the docs are organized and how to contribute.
+- `Architecture`: platform and system interactions.
+- `Systems`: one page per active product/system with implementation details.
+- `Process`: RFC lifecycle, contribution rules, documentation governance.
+- `Reference`: glossary and reusable writing templates.
+- `RFCs`: design decision records and long-form technical proposals.
 
-## Generate a new site
+## Authoring principles
 
-Generate a new Docusaurus site using the **classic template**.
+- Prefer MDX for rich pages (tables, callouts, diagrams, and snippets).
+- Keep pages domain-oriented and practical: architecture, behavior, operations, and ownership.
+- Avoid duplicating RFC content; summarize and link to canonical RFCs when needed.
+- Use templates in `Reference` when creating new system pages.
 
-The classic template will automatically be added to your project after you run the command:
+## Next steps
 
-```bash
-npm init docusaurus@latest my-website classic
-```
+- Start at [Documentation Map](overview/documentation-map.md).
+- Fill in system pages in [Systems](systems/intro.md) with detailed implementation notes.
+- Keep RFCs in the dedicated [RFC library](/rfcs/speech-to-speech).
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
-
-The command also installs all necessary dependencies you need to run Docusaurus.
-
-## Start your site
-
-Run the development server:
-
-```bash
-cd my-website
-npm run start
-```
-
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
-
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
