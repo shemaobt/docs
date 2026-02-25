@@ -29,19 +29,6 @@ jobs:
       - name: Checkout deploy repository
         uses: actions/checkout@v4
 
-      - name: Checkout RFC content from main branch
-        uses: actions/checkout@v4
-        with:
-          repository: shemaobt/rfcs
-          ref: main
-          path: rfcs-source
-          token: ${{ secrets.GH_RFCS_READ_TOKEN }}
-
-      - name: Prepare RFC content for Docker build context
-        run: |
-          rm -rf rfcs
-          cp -R rfcs-source/rfcs ./rfcs
-
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
