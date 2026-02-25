@@ -1,0 +1,25 @@
+services:
+  docs:
+    image: node:20-alpine
+    working_dir: /workspace/site
+    ports:
+      - "3000:3000"
+    environment:
+      DOCS_BASE_URL: /
+      DOCS_SITE_URL: http://localhost:3000
+      DOCS_CONTENT_PATH: docs
+      RFCS_DOCS_PATH: /workspace/rfcs
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - ./site:/workspace/site
+      - ./assets:/workspace/assets:ro
+      - ./rfcs:/workspace/rfcs:ro
+      - docs_node_modules:/workspace/site/node_modules
+      - docs_docusaurus:/workspace/site/.docusaurus
+      - docs_build:/workspace/site/build
+    command: sh -c "npm ci && npm run clear && npm run start -- --host 0.0.0.0 --port 3000"
+
+volumes:
+  docs_node_modules:
+  docs_docusaurus:
+  docs_build:

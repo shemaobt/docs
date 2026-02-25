@@ -5,3 +5,4 @@ site/node_modules
 site/build
 
 .DS_Store
+latest-run.log

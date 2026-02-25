@@ -7,6 +7,7 @@ RUN npm ci
 WORKDIR /app
 COPY site ./site
 COPY rfcs ./rfcs
+COPY assets ./assets
 
 WORKDIR /app/site
 RUN DOCS_BASE_URL=/ DOCS_SITE_URL=https://docs.example.com RFCS_DOCS_PATH=../rfcs npm run build
