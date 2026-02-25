@@ -193,7 +193,7 @@ flowchart LR
 
 - [Semantic Acoustic Mapping](/rfcs/semantic-acoustic-mapping), [Semantic Acoustic Linking](/rfcs/semantic-acoustic-linking) — semantic representation and linking.
 - [Parallel Acousteme Latent Translation](/rfcs/parallel-acousteme-latent-translation), [Oral-First Translation Reframe](/rfcs/oral-first-acousteme-translation-reframe) — translation direction and oral-first flow; relevant to how units and vocoders are used in translation pipelines.
-- [XEUS / Feature extractor comparison](/rfcs/xeus-feature-extractor-comparison) — choice of self-supervised feature extractor for Phase 1 (XEUS vs MMS-300M vs XLSR-53); trade-offs for low-resource languages and pipeline compatibility.
+- [XEUS / Feature extractor comparison](/rfcs/xeus-vs-mms-foundation-model-analysis) — choice of self-supervised feature extractor for Phase 1 (XEUS vs MMS-300M vs XLSR-53); trade-offs for low-resource languages and pipeline compatibility.
 
 ---
 

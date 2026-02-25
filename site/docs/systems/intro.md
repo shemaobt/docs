@@ -11,11 +11,12 @@ Each page in this section is designed to be a living source of truth for a singl
 
 - [obt-mentor-companion](obt-mentor-companion.md)
 - [translation-helper](translation-helper.md)
-- [mm_poc_v2](mm-poc-v2.md)
 - [tripod studio](tripod-studio.md)
 - [meaning map generator](meaning-map-generator.md)
 - [oral bridge](oral-bridge.md)
 - [proprietary ml models](proprietary-ml-models.md)
+- [data-collection](data-collection.md)
+- [tagger](tagger.md)
 
 ## How to use these pages
 
