@@ -16,6 +16,8 @@ const sidebars: SidebarsConfig = {
         'systems/obt-mentor-companion',
         'systems/translation-helper',
         'systems/tripod-studio',
+        'systems/meaning-map-generator',
+        'systems/oral-bridge',
         'systems/data-collection',
         'systems/tagger',
       ],
@@ -24,8 +26,6 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Research and Models',
       items: [
-        'systems/meaning-map-generator',
-        'systems/oral-bridge',
         'systems/proprietary-ml-models',
       ],
     },
