@@ -13,10 +13,11 @@ const sidebars: SidebarsConfig = {
       label: 'Systems',
       items: [
         'systems/intro',
-        'systems/mm-poc-v2',
         'systems/obt-mentor-companion',
         'systems/translation-helper',
         'systems/tripod-studio',
+        'systems/data-collection',
+        'systems/tagger',
       ],
     },
     {
