@@ -7,395 +7,182 @@ sidebar_position: 2
 
 ## Purpose
 
-The Tripod Oral workflow is a **Conditionally Generated Spoken Language Model (CG-SLM)** pipeline designed for **zero-resource languages**. Its core innovation is a direct **Semantic-Acoustic Bridge**: instead of using written text and transcription as the central intermediate, the system learns to generate natural target speech directly from semantic meaning.
+The Tripod Oral Method is a way to help communities receive Scripture in the way they naturally communicate: spoken language. It is built for places where written materials are limited, where literacy levels vary, or where people learn best by listening and repeating.
 
-This page explains the architecture in a beginner-friendly, phase-by-phase format: what each component does, how data moves between components, and where human validation is applied.
+Instead of treating written text as the center of everything, Tripod starts from meaning, learns from real community speech, and produces spoken drafts that can be reviewed by local speakers and mentors.
 
-## Core flows
+This page explains the method in plain language, with enough detail for first-time readers.
 
-- **Flow 1 - Data grounding**: build semantic meaning maps and collect authentic community speech.
-- **Flow 2 - Bridge alignment**: convert speech to discrete units and align them to ontology-level meaning tags.
-- **Flow 3 - Generative training**: train a Seq2Seq model to map semantic tokens to acoustic motifs.
-- **Flow 4 - Production and review**: generate new spoken passages, vocode them to audio, and validate with community and mentor review.
+## The core problem: translationese
 
-## Architecture
+Traditional translation often follows the structure of the source language too closely. The result can be accurate on paper but awkward when spoken. People sometimes call this **translationese**: a translation that sounds foreign, stiff, or unnatural.
 
-Start with the global map, then read each numbered block.
+For oral communities, Scripture should sound like a trusted storyteller from the community, not like a foreign sentence read aloud. Tripod is designed around that goal.
 
-```mermaid
-flowchart LR
-    subgraph P1["Phase 1 - Grounding"]
-      A1[BMM app + Tripod Ontology]
-      A2[Meaning Map JSON]
-      A3[Language Archive raw audio]
-      A1 --> A2
-    end
+## What success looks like
 
-    subgraph P2["Phase 2 - Acoustic-Semantic Bridge"]
-      B1[SSL quantization]
-      B2[Discrete units]
-      B3[BPE motifs]
-      B4[AViTA semantic tagging]
-      A3 --> B1 --> B2 --> B3 --> B4
-    end
+Tripod is considered successful when the spoken result is:
 
-    subgraph P3["Phase 3 - Generative Training"]
-      C1[Semantic token sequence]
-      C2[Seq2Seq Transformer]
-      C3[Learned semantic to acoustic mapping]
-      A2 --> C1 --> C2 --> C3
-      B4 --> C2
-    end
+- **Faithful**: it keeps the original meaning and does not add or remove key ideas.
+- **Natural**: it sounds like normal speech from that community.
+- **Clear**: listeners understand without needing extra explanation.
+- **Consistent**: important biblical ideas are expressed with stable, approved terms.
+- **Usable**: recordings are ready to share through community listening channels.
 
-    subgraph P4["Phase 4 - Inference and Validation"]
-      D1[RAG retrieval from archive + concept bank]
-      D2[Generate units or motifs]
-      D3[HiFi-GAN vocoder]
-      D4[Tripod Studio validator and mentor loop]
-      D5[Spoken Bible app]
-      C3 --> D2 --> D3 --> D4 --> D5
-      D1 --> D2
-    end
-```
+## The three pillars (the "Tripod")
 
-### 1.1 Phase 1 - Data collection and grounding
-
-Phase 1 gathers the two foundational inputs for the whole pipeline:
-
-1. **Pure meaning (semantic grounding)**
-2. **Pure sound (acoustic grounding)**
-
-#### Semantic grounding
-
-- **Software/framework**: Biblical Meaning Maps (BMM) app + Tripod Ontology v5.3.
-- **How it works**: exegetes and facilitators analyze source biblical text and map it into a language-agnostic, hierarchical Meaning Map JSON.
-- **What the ontology captures**:
-  - participants (who)
-  - events (what action/state)
-  - semantic roles (initiator, affected, etc.)
-  - pragmatic layers (discourse function, emotion, evidentiality)
-  - cross-linguistic patterns (for example causatives and honorifics)
-
-#### Acoustic grounding
-
-- **Input system**: Language Archive.
-- **How it works**: collect 100+ hours of natural speech from native speakers (stories, dialogues, procedural speech).
-- **Constraint**: no transcription and no translation required for this archive.
-
-Why this phase matters: it establishes an oral-first foundation for languages where text infrastructure is limited or absent.
-
-#### Phase 1 diagram
-
-```mermaid
-flowchart LR
-    A[Source biblical text] --> B[BMM app]
-    B --> C[Tripod Ontology v5.3 mapping]
-    C --> D[Meaning Map JSON]
-
-    E[Community speech recordings] --> F[Language Archive]
-    F --> G[100+ hours raw audio]
-```
-
-**Reference basis:** [Architecture deep dive](/rfcs/architecture-deep-dive), [Training pipeline](/rfcs/training-pipeline)
-
-### 1.2 Meaning map generation block
-
-This block provides the semantic control structure for generation.
-
-- **Input**: source passage analysis.
-- **Output**: Meaning Map JSON with participants, events, discourse, and pragmatic structure.
-- **Role in architecture**: this is the semantic contract consumed by the generative model.
-
-#### Meaning map generation diagram
-
-```mermaid
-flowchart LR
-    A[Source pericope text] --> B[Meaning Map generator workflow]
-    B --> C[Participants]
-    B --> D[Events]
-    B --> E[Semantic roles]
-    B --> F[Pragmatics and discourse]
-    C --> G[Meaning Map JSON]
-    D --> G
-    E --> G
-    F --> G
-```
-
-**Reference basis:** [Semantic acoustic mapping](/rfcs/semantic-acoustic-mapping), [Semantic acoustic linking](/rfcs/semantic-acoustic-linking)
-
-### 2.1 Concept bank block
-
-The Concept Bank stores validated semantic anchors used during retrieval and generation.
-
-- **Input**: curated term definitions and approved specialist decisions.
-- **Output**: canonical concept list and term-level constraints.
-- **Role**: reduce ambiguity for high-stakes terms and keep theological phrasing stable.
-
-#### Concept bank diagram
-
-```mermaid
-flowchart LR
-    A[Specialist term review] --> B[Concept Bank]
-    B --> C[Validated key-term anchors]
-    C --> D[RAG retrieval]
-    D --> E[Generation constraints]
-```
-
-**Reference basis:** [Semantic acoustic linking](/rfcs/semantic-acoustic-linking)
-
-### Phase 2 - Acoustic-Semantic Bridge (alignment)
-
-This phase is the technical substitute for text alignment.
-
-#### Phase 2 diagram
-
-```mermaid
-flowchart LR
-    A[Language Archive raw audio] --> B[SSL model<br/>HuBERT / wav2vec2 / XLS-R / MMS]
-    B --> C[Discrete acoustic units]
-    C --> D[BPE or adaptive segmentation]
-    D --> E[Acoustic motifs]
-    E --> F[AViTA human-in-the-loop tagging]
-    F --> G[Semantically aligned motifs]
-```
-
-#### Phase 2 data contract diagram
+Tripod stands on three knowledge pillars.
 
 ```mermaid
 flowchart TB
-    A[Raw waveform] --> B[SSL frame embeddings]
-    B --> C[Unit ids]
-    C --> D[Motif ids]
-    D --> E[Tagged motif spans]
-    E --> F[(Bridge dataset)]
-
-    G[Tripod ontology labels] --> E
-    H[Native speaker decisions] --> E
+    A[Meaning Maps<br/>the blueprint]
+    B[Language Archive<br/>the voice and flow]
+    C[Concept Bank<br/>approved key terms]
+    A --> D[Tripod oral translation]
+    B --> D
+    C --> D
 ```
 
-#### Step A: Acoustic quantization (pseudo-text)
+### Pillar 1: Meaning Maps (the blueprint)
 
-- **Models**: self-supervised speech models such as HuBERT, wav2vec 2.0, XLS-R, and MMS.
-- **How it works**: raw audio is encoded into sequences of discrete acoustic units.
-- **Example output**: `[Unit_45, Unit_102, Unit_88, ...]`
-- **Why it exists**: creates a machine-readable speech alphabet without transcripts.
+A Meaning Map is a language-neutral map of a passage:
 
-#### Step B: Unsupervised pattern discovery (grammar discovery)
+- who is involved,
+- what happens,
+- what emotions are present,
+- what social dynamics are important.
 
-- **Algorithms/tools**: BPE (SentencePiece) or adaptive segmentation.
-- **How it works**: recurring unit patterns are merged into **acoustic motifs**.
-- **Example motif**: `<45_12>`
-- **Why it exists**: motifs behave like morphology-level building blocks before explicit semantic binding.
+It does not try to keep the grammar of the source language. It keeps the meaning and intent.
 
-#### Step C: Dense conversational tagging (targeted supervision)
+Think of it like an architect's sketch: it is not the final building, but it protects structure so construction stays true to the design.
 
-- **Tool**: AViTA (Aural-Visual Tagging App).
-- **How it works**:
-  - facilitator asks ontology-aligned plain-language prompts,
-  - native speaker isolates the relevant sound span,
-  - facilitator tags that motif span with ontology labels (for example evidentiality markers).
-- **Efficiency strategy**: Pareto active learning focuses human effort on strategic 5-10 hours instead of labeling the full 100+ hour archive.
+### Pillar 2: Language Archive (the voice and flow)
 
-Output of phase 2: a practical semantic-acoustic bridge where motifs and ontology categories are linked with human-validated supervision.
+The Language Archive is a large collection of natural local speech (stories, conversations, everyday explanations). The system learns how the community naturally speaks and tells stories.
 
-**Reference basis:** [Raw acoustemes storage](/rfcs/raw-acoustemes-storage), [Semantic acoustic mapping](/rfcs/semantic-acoustic-mapping), [Semantic acoustic linking](/rfcs/semantic-acoustic-linking)
+This is important because naturalness cannot be invented in an office. It must come from real local voices, real rhythm, real storytelling habits, and real social tone.
 
-### Phase 3 - Model training
+### Pillar 3: Concept Bank (approved vocabulary)
 
-- **Model family**: Seq2Seq Transformer.
-- **Input X**: flattened semantic token sequence from Meaning Map.
-  - Example: `[START] [ROLE:initiator] [CONCEPT:David] [ASPECT:perfective] ...`
-- **Target Y**: acoustic motif sequence discovered/aligned in phase 2.
-- **Learning objective**: learn robust mapping from semantic structure to natural target-language acoustic realization.
+Some biblical terms need extra care. The Concept Bank keeps community-approved ways to express important concepts (for example grace, covenant, temple) so these meanings stay clear and consistent.
 
-What the model learns:
+Without this pillar, different drafts can drift and confuse listeners. With it, high-impact terms stay stable across passages.
 
-- motif selection under semantic constraints
-- oral-language ordering patterns from native data
-- pragmatic realization (how aspect, discourse, and role structure influence output)
+## Teaching the bridge between meaning and sound
 
-#### Phase 3 diagram
+Tripod must connect abstract meaning directly to real speech patterns.
 
 ```mermaid
 flowchart LR
-    A[Meaning Map JSON] --> B[Semantic token flattener]
-    B --> C[Seq2Seq Transformer]
-    D[Aligned acoustic motifs] --> C
-    C --> E[Learned semantic-to-acoustic mapping]
+    A[Meaning idea] --> B[Facilitator question]
+    B --> C[Native speaker points to sound]
+    C --> D[Tagged example]
+    D --> E[System learns pattern]
 ```
 
-#### Phase 3 training objective diagram
+### AViTA (Aural-Visual Tagging App)
 
-```mermaid
-flowchart TB
-    A[Semantic tokens] --> T[Seq2Seq Transformer]
-    B[Acoustic motifs] --> L[Target sequence loss]
-    T --> P[Predicted motifs]
-    P --> L
-    L --> U[Parameter update]
-    U --> T
-```
+AViTA helps a facilitator and a native speaker work together. The facilitator asks plain-language questions, and the speaker identifies the matching sound in real audio. This teaches the system how meaning is expressed in that language's natural speech.
 
-**Reference basis:** [Parallel acousteme latent translation](/rfcs/parallel-acousteme-latent-translation), [Oral-first acousteme translation reframe](/rfcs/oral-first-acousteme-translation-reframe)
+### Smart sampling (Pareto active learning)
 
-### Phase 4 - Inference (generation) and validation
+Instead of labeling everything, the team focuses on the most informative examples first. By reviewing a smaller strategic set, the system can learn much faster while still improving quality.
 
-This is the production loop for a new passage.
+In practice, this means teams spend time on the examples that teach the biggest lessons first, rather than trying to review every minute of audio in the same way.
 
-#### Phase 4 diagram
+## Who does what
 
-```mermaid
-flowchart LR
-    A[New Meaning Map] --> B[RAG retrieval<br/>archive + concept bank]
-    B --> C[Seq2Seq generation]
-    C --> D[Predicted units/motifs]
-    D --> E[HiFi-GAN vocoder]
-    E --> F[Generated audio]
-    F --> G[Tripod Studio Validator]
-    G --> H[Mentor faithfulness analysis]
-    H --> I{Approved?}
-    I -- no --> B
-    I -- yes --> J[Spoken Bible app delivery]
-```
+Tripod is not "fully automatic." Different people carry different responsibilities:
 
-#### Validation state diagram
+- **Facilitator**: guides sessions, asks clear questions, and organizes reviews.
+- **Native speaker validator**: checks naturalness, tone, and local acceptability.
+- **Mentor**: checks faithfulness to meaning and theological safety.
+- **Community listeners**: confirm that the final result is understandable and culturally appropriate.
+- **Translation team**: manages term decisions, quality records, and release readiness.
 
-```mermaid
-stateDiagram-v2
-    [*] --> Generated
-    Generated --> ValidatorReview
-    ValidatorReview --> NeedsRevision: Naturalness issues
-    ValidatorReview --> MentorReview: Validator pass
-    MentorReview --> NeedsRevision: Faithfulness warning/fail
-    MentorReview --> Approved: Pass
-    NeedsRevision --> Regenerated
-    Regenerated --> ValidatorReview
-    Approved --> Published
-    Published --> [*]
-```
+## How a new translation is created
 
-#### Step A: Retrieval-Augmented Generation (RAG)
-
-- **Architecture/tools**: vector database retrieval over Language Archive and Concept Bank.
-- **How it works**:
-  - retrieve prosodic templates by genre/emotion/context,
-  - retrieve validated term anchors for key concepts.
-- **Why it exists**: keeps generation natural and culturally grounded while protecting key-term fidelity.
-
-#### Step B: Synthesis (symbolic generation)
-
-- **Model**: Seq2Seq Transformer.
-- **How it works**: conditioned by Meaning Map + retrieved guidance, generate final acoustic-unit/motif sequence.
-
-#### Step C: Vocoding (audible realization)
-
-- **Model**: HiFi-GAN vocoder.
-- **How it works**: convert predicted symbolic units into high-fidelity waveform audio.
-- **Why it exists**: the generator outputs abstract units; HiFi-GAN outputs real speech with natural rhythm and timbre.
-
-#### Step D: Validation and refinement in Tripod Studio
-
-- **Software**: Tripod Studio app.
-- **Validator tab**:
-  - native speaker checks naturalness and flow,
-  - records segment-level feedback when edits are needed.
-- **Mentor tab**:
-  - after validator pass, mentor runs faithfulness analysis against Meaning Map,
-  - traffic-light style result (Pass/Warning/Fail) highlights theological risk.
-- **Review loop**: validator and mentor exchange voice feedback until final approval.
-
-**Reference basis:** [AudioLM integration](/rfcs/audiolm-integration), [Parallel acousteme latent translation](/rfcs/parallel-acousteme-latent-translation), [Oral-first acousteme translation reframe](/rfcs/oral-first-acousteme-translation-reframe)
-
-### 3 Delivery layer - spoken Bible app
-
-Approved spoken outputs are packaged and delivered through the Spoken Bible app (mobile-facing experience). This is where the pipeline becomes a community-facing ministry product.
-
-#### Delivery diagram
+When translating a new passage, Tripod behaves more like a composer than a word-for-word converter.
 
 ```mermaid
 flowchart LR
-    A[Approved spoken pericope] --> B[Packaging and metadata]
-    B --> C[Spoken Bible app distribution]
-    C --> D[Community listening and feedback]
+    A[Read Meaning Map] --> B[Pull key terms from Concept Bank]
+    B --> C[Find matching storytelling style in Language Archive]
+    C --> D[Create new spoken draft]
 ```
 
-## Runtime and deployment
+In simple terms, it combines:
 
-- **Collection layer**: mobile/web collection workflows and language archive ingestion.
-- **Model/training layer**: SSL extraction, motif discovery, seq2seq training, and vocoder training.
-- **Inference layer**: retrieval + seq2seq + vocoder generation services.
-- **Review layer**: Tripod Studio validator/mentor workflow.
-- **Delivery layer**: spoken Bible app distribution.
+1. the intended meaning,
+2. the approved key terms,
+3. the natural local storytelling style.
 
-```mermaid
-flowchart TB
-    A[Collection layer] --> B[Model and training layer]
-    B --> C[Inference layer]
-    C --> D[Review layer]
-    D --> E[Delivery layer]
-```
+The output is new spoken audio designed to sound native and faithful.
 
-## Integrations
+## Typical workflow from start to finish
 
-- **Meaning Maps + Tripod Ontology**: semantic source-of-truth contract.
-- **Language Archive**: raw speech corpus and retrieval source.
-- **AViTA**: motif-level semantic supervision.
-- **Concept Bank**: controlled term anchors for key theological vocabulary.
-- **Tripod Studio**: human quality gate for naturalness and faithfulness.
+1. **Prepare the passage meaning**
+ - The team creates or reviews the Meaning Map for the selected passage.
+2. **Check key terms**
+ - The team confirms how sensitive terms should be said in this context.
+3. **Create a first spoken draft**
+ - A draft is generated using local speech patterns learned from the archive.
+4. **Validator review**
+ - A native speaker marks places that sound unnatural, unclear, or socially off-tone.
+5. **Mentor review**
+ - A mentor checks whether meaning is preserved, especially in doctrinally sensitive content.
+6. **Revise and repeat**
+ - The draft is adjusted and reviewed again until both naturalness and faithfulness are strong.
+7. **Community readiness check**
+ - The team decides if the recording is suitable for broader listening use.
 
-```mermaid
-flowchart LR
-    MM[Meaning Maps and Ontology] --> GEN[Generation core]
-    LA[Language Archive] --> GEN
-    AV[AViTA labels] --> GEN
-    CB[Concept Bank] --> GEN
-    GEN --> TS[Tripod Studio]
-    TS --> APP[Spoken Bible app]
-```
+## Community validation (final authority)
 
-## End-to-end flow
+AI can help draft, but people make the final decision.
 
 ```mermaid
 flowchart LR
-    A[Meaning Maps and Tripod Ontology] --> D[Semantic Tokens]
-    B[Language Archive audio] --> C[SSL acoustic quantization]
-    C --> E[BPE or adaptive motif discovery]
-    E --> F[AViTA tagging and semantic alignment]
-    D --> G[Seq2Seq transformer training]
-    F --> G
-    H[Vector retrieval from archive and concept bank] --> I[Inference for new passage]
-    G --> I
-    I --> J[Predicted acoustic units or motifs]
-    J --> K[HiFi-GAN vocoder]
-    K --> L[Generated spoken pericope]
-    L --> M[Tripod Studio validator and mentor loop]
-    M --> N[Spoken Bible app delivery]
+    A[Generated audio] --> B[Validator review]
+    B --> C[Mentor faithfulness review]
+    C --> D[Community approval]
+    D --> E[Ready to share]
 ```
 
-## Related RFCs
+### Validator
 
-- [Speech to speech](/rfcs/speech-to-speech)
-- [Architecture deep dive](/rfcs/architecture-deep-dive)
-- [Training pipeline](/rfcs/training-pipeline)
-- [AudioLM integration](/rfcs/audiolm-integration)
-- [Raw acoustemes storage](/rfcs/raw-acoustemes-storage)
-- [Semantic acoustic mapping](/rfcs/semantic-acoustic-mapping)
-- [Semantic acoustic linking](/rfcs/semantic-acoustic-linking)
-- [XEUS vs MMS foundation model analysis](/rfcs/xeus-vs-mms-foundation-model-analysis)
-- [Parallel acousteme latent translation](/rfcs/parallel-acousteme-latent-translation)
-- [Oral-first acousteme translation reframe](/rfcs/oral-first-acousteme-translation-reframe)
+A native speaker checks if the audio sounds natural and clear. If needed, they give voice feedback for corrections.
 
-## Roadmap and open questions
+### Mentor
 
-- **Near-term milestones**:
-  - stabilize ontology-to-motif alignment quality metrics,
-  - formalize AViTA tagging protocol and active-learning sample policy,
-  - standardize RAG retrieval tags (genre, emotion, discourse, term criticality).
-- **Known risks**:
-  - semantic drift between generated motifs and intended meaning,
-  - overfitting to small tagged supervision windows,
-  - vocoder quality variance across speaker/style conditions.
-- **Decisions pending**:
-  - canonical API contracts between Meaning Map outputs and generation inputs,
-  - confidence thresholds for auto-pass versus mandatory human review,
-  - release policy for community-approved versus experimental generated passages.
+A translation mentor checks if the spoken draft stays faithful to the Meaning Map and does not lose or add theological meaning.
+
+### Community
+
+The community gives final approval for appropriateness and readiness to share.
+
+## Why this approach matters for oral-first ministry
+
+- It respects how people actually learn and pass on knowledge.
+- It reduces dependence on written intermediate drafts.
+- It protects meaning while honoring local expression.
+- It scales support for languages that have fewer formal translation resources.
+- It keeps human discernment in the final gate, where it belongs.
+
+## Boundaries and cautions
+
+Tripod is powerful, but it still requires discipline:
+
+- A draft that sounds fluent is not automatically faithful.
+- Key term decisions must be maintained and reviewed over time.
+- Community approval is essential before broad distribution.
+- Quality depends on strong local participation, not only tooling.
+
+## Summary
+
+Tripod helps oral communities receive Scripture in a way that sounds natural, culturally grounded, and faithful to meaning. It protects local storytelling style while keeping key biblical concepts accurate.
+
+## Related reading
+
+- [Tripod (Tech Overview)](/docs/architecture/tripod-tech-overview)
+- [System Landscape](/docs/architecture/system-landscape)
+
