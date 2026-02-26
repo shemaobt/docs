@@ -1,13 +1,13 @@
 ---
-title: Data Collection
+title: Oral Capture
 sidebar_position: 9
 ---
 
-# Data collection app
+# Oral Capture
 
 ## Purpose
 
-Mobile and web app for missionaries to collect monolingual audio data with local people. The system replaces manual, resource-heavy workflows (e.g. Adobe Podcast) with an offline-first app: record or upload audio, tag by predefined genre/subcategory, sync when online, and optionally clean audio via API (web). Target users are field collectors and project admins; outcomes are categorized, per-language audio corpora with clear ownership, upload status, and support for a “not clean” / cleaning workflow.
+Mobile and web app for missionaries to collect monolingual audio data with local people. The system replaces manual, resource-heavy workflows (e.g. Adobe Podcast) with an offline-first app: record or upload audio, tag by predefined genre/subcategory, sync when online, and optionally clean audio via API (web). Target users are field collectors and project admins; outcomes are categorized, per-language audio corpora with clear ownership, upload status, and support for a “not clean” / cleaning workflow. Recordings feed the Tripod **Language Archive** (100+ hours of natural speech per language).
 
 ## Core capabilities
 

@@ -14,8 +14,8 @@ Each page in this section is designed to be a living source of truth for a singl
 - [tripod studio](/docs/systems/tripod-studio)
 - [meaning map generator](/docs/systems/meaning-map-generator)
 - [oral bridge](/docs/systems/oral-bridge)
-- [data-collection](/docs/systems/data-collection)
-- [avita-tagger](/docs/systems/avita)
+- [Oral Capture](/docs/systems/data-collection)
+- [avita](/docs/systems/avita)
 
 ## How to use these pages
 

@@ -24,7 +24,7 @@ flowchart LR
       F(oral-bridge)
     end
     subgraph LanguageArchive["Language Archive"]
-      W(data-collection)
+      W(oral-capture)
     end
     subgraph ConceptBank["Concept Bank"]
       U(to be defined)
