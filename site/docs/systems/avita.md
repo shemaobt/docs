@@ -1,5 +1,5 @@
 ---
-title: tagger motifs app
+title: AViTA (Aural-Visual Tagging App)
 sidebar_position: 10
 ---
 

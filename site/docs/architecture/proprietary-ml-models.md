@@ -1,6 +1,6 @@
 ---
 title: Proprietary ML Models
-sidebar_position: 8
+sidebar_position: 4
 ---
 
 # Proprietary ML Models

@@ -1,5 +1,5 @@
 ---
-title: Data collection app
+title: Data Collection
 sidebar_position: 9
 ---
 

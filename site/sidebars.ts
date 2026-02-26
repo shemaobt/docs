@@ -13,20 +13,36 @@ const sidebars: SidebarsConfig = {
       label: 'Systems',
       items: [
         'systems/intro',
-        'systems/obt-mentor-companion',
-        'systems/translation-helper',
-        'systems/tripod-studio',
-        'systems/meaning-map-generator',
-        'systems/oral-bridge',
-        'systems/data-collection',
-        'systems/tagger',
+        {
+          type: 'category',
+          label: 'Missionary Training',
+          items: ['systems/obt-mentor-companion'],
+        },
+        {
+          type: 'category',
+          label: 'Missionary Support',
+          items: ['systems/translation-helper'],
+        },
+        {
+          type: 'category',
+          label: 'Tripod',
+          items: [
+            'systems/tripod-studio',
+            'systems/meaning-map-generator',
+            'systems/oral-bridge',
+            'systems/data-collection',
+            'systems/avita',
+          ],
+        },
       ],
     },
     {
       type: 'category',
       label: 'Research and Models',
       items: [
-        'systems/proprietary-ml-models',
+        'architecture/tripod-overview',
+        'architecture/tripod-tech-overview',
+        'architecture/proprietary-ml-models',
       ],
     },
     {

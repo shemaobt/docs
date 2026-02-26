@@ -9,14 +9,13 @@ Each page in this section is designed to be a living source of truth for a singl
 
 ## Current systems
 
-- [obt-mentor-companion](obt-mentor-companion.md)
-- [translation-helper](translation-helper.md)
-- [tripod studio](tripod-studio.md)
-- [meaning map generator](meaning-map-generator.md)
-- [oral bridge](oral-bridge.md)
-- [proprietary ml models](proprietary-ml-models.md)
-- [data-collection](data-collection.md)
-- [tagger](tagger.md)
+- [obt-mentor-companion](/docs/systems/obt-mentor-companion)
+- [translation-helper](/docs/systems/translation-helper)
+- [tripod studio](/docs/systems/tripod-studio)
+- [meaning map generator](/docs/systems/meaning-map-generator)
+- [oral bridge](/docs/systems/oral-bridge)
+- [data-collection](/docs/systems/data-collection)
+- [avita-tagger](/docs/systems/avita)
 
 ## How to use these pages
 

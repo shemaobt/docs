@@ -1,9 +1,9 @@
 ---
-title: tripod studio
+title: Tripod Studio
 sidebar_position: 5
 ---
 
-# tripod studio
+# Tripod Studio
 
 ## Purpose
 
