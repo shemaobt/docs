@@ -78,7 +78,7 @@ Phase 1 gathers the two foundational inputs for the whole pipeline:
 
 #### Acoustic grounding
 
-- **Input system**: Language Archive.
+- **Input system**: Language Archive (populated by the [Oral Capture](/docs/systems/data-collection) app).
 - **How it works**: collect 100+ hours of natural speech from native speakers (stories, dialogues, procedural speech).
 - **Constraint**: no transcription and no translation required for this archive.
 
@@ -180,23 +180,37 @@ flowchart TB
 - **Example output**: `[Unit_45, Unit_102, Unit_88, ...]`
 - **Why it exists**: creates a machine-readable speech alphabet without transcripts.
 
-#### Step B: Unsupervised pattern discovery (grammar discovery)
+#### Step B: Motif discovery (morphological vocabulary)
 
 - **Algorithms/tools**: BPE (SentencePiece) or adaptive segmentation.
-- **How it works**: recurring unit patterns are merged into **acoustic motifs**.
+- **How it works**: recurring unit patterns are merged into **acoustic motifs** (typically 500–1000 tokens).
 - **Example motif**: `<45_12>`
-- **Why it exists**: motifs behave like morphology-level building blocks before explicit semantic binding.
+- **Why it exists**: motifs act as the unlabelled morphological building blocks of the language; they are the primary input to AViTA tagging in Step C.
+- **Note**: This step is required for the pipeline (not optional) because AViTA operates on motifs, not raw discrete units.
 
 #### Step C: Dense conversational tagging (targeted supervision)
 
 - **Tool**: AViTA (Aural-Visual Tagging App).
+- **Inputs**:
+  - raw audio segments from the Language Archive,
+  - acoustic motifs (BPE vocabulary from Step B),
+  - active learning prompts (model uncertainty selects high-value clips),
+  - Tripod Ontology v5.3 question library.
 - **How it works**:
   - facilitator asks ontology-aligned plain-language prompts,
   - native speaker isolates the relevant sound span,
-  - facilitator tags that motif span with ontology labels (for example evidentiality markers).
-- **Efficiency strategy**: Pareto active learning focuses human effort on strategic 5-10 hours instead of labeling the full 100+ hour archive.
+  - facilitator "paints" ontology tags onto motif spans with precise timestamps,
+  - optionally records audio glosses for future reference.
+- **Outputs**:
+  - aligned training dataset (`.pt` file),
+  - timestamped semantic-acoustic anchors linking ontology tags to motifs,
+  - feature bundles for complex grammatical markers,
+  - audio glosses attached to newly identified motifs.
+- **Efficiency strategy**: Pareto active learning focuses human effort on strategic 5–10 hours (dense tagging) instead of labeling the full 100+ hour archive; semi-dense (1–2 hours) and minimal (1 hour edge cases) tagging layers extend coverage efficiently.
 
 Output of phase 2: a practical semantic-acoustic bridge where motifs and ontology categories are linked with human-validated supervision.
+
+See [AViTA system documentation](/docs/systems/avita) for full workflow details.
 
 **Reference basis:** [Raw acoustemes storage](/rfcs/raw-acoustemes-storage), [Segmentation strategy](/rfcs/segmentation-strategy), [Xeus vs MMS foundation model analysis](/rfcs/xeus-vs-mms-foundation-model-analysis), [Semantic acoustic linking](/rfcs/semantic-acoustic-linking)
 
@@ -338,7 +352,7 @@ flowchart TB
 ## Integrations
 
 - **Meaning Maps + Tripod Ontology**: semantic source-of-truth contract.
-- **Language Archive**: raw speech corpus and retrieval source.
+- **Language Archive**: raw speech corpus and retrieval source (recordings collected via [Oral Capture](/docs/systems/data-collection)).
 - **AViTA**: motif-level semantic supervision.
 - **Concept Bank**: controlled term anchors for key theological vocabulary.
 - **Tripod Studio**: human quality gate for naturalness and faithfulness.
