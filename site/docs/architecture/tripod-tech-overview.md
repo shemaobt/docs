@@ -262,14 +262,16 @@ This is the production loop for a new passage.
 flowchart LR
     A[New Meaning Map] --> B[RAG retrieval<br/>archive + concept bank]
     B --> C[Seq2Seq generation]
-    C --> D[Predicted units/motifs]
-    D --> E[HiFi-GAN vocoder]
-    E --> F[Generated audio]
-    F --> G[Tripod Studio Validator]
-    G --> H[Mentor faithfulness analysis]
-    H --> I{Approved?}
-    I -- no --> B
-    I -- yes --> J[Spoken Bible app delivery]
+    C --> D[Predicted motif sequence]
+    D --> D2[BPE decode<br/>motifs → units]
+    D2 --> E[Discrete unit sequence]
+    E --> F[HiFi-GAN vocoder]
+    F --> G[Generated audio]
+    G --> H[Tripod Studio Validator]
+    H --> I[Mentor faithfulness analysis]
+    I --> J{Approved?}
+    J -- no --> B
+    J -- yes --> K[Spoken Bible app delivery]
 ```
 
 #### Validation state diagram
@@ -299,13 +301,15 @@ stateDiagram-v2
 #### Step B: Synthesis (symbolic generation)
 
 - **Model**: Seq2Seq Transformer.
-- **How it works**: conditioned by Meaning Map + retrieved guidance, generate final acoustic-unit/motif sequence.
+- **How it works**: conditioned by Meaning Map + retrieved guidance, the model generates a **motif sequence** (or, in some setups, a discrete unit sequence directly).
+- **When the output is motifs**: a **BPE decode** step expands the motif sequence back to a **discrete acoustic unit (acousteme) sequence** using the same BPE vocabulary from Phase 2. BPE is reversible: each motif ID maps to a fixed sequence of unit IDs, so decode is deterministic and lossless.
 
 #### Step C: Vocoding (audible realization)
 
 - **Model**: HiFi-GAN vocoder.
-- **How it works**: convert predicted symbolic units into high-fidelity waveform audio.
-- **Why it exists**: the generator outputs abstract units; HiFi-GAN outputs real speech with natural rhythm and timbre.
+- **Input**: the **discrete unit sequence** (acoustemes). The vocoder is trained on unit sequences, not motif IDs; so after Seq2Seq and optional BPE decode, the pipeline always feeds a unit sequence into the vocoder.
+- **How it works**: convert that unit sequence into high-fidelity waveform audio.
+- **Why it exists**: the generator outputs abstract symbolic sequence; HiFi-GAN turns it into real speech with natural rhythm and timbre.
 
 #### Step D: Validation and refinement in Tripod Studio
 
@@ -379,11 +383,13 @@ flowchart LR
     F --> G
     H[Vector retrieval from archive and concept bank] --> I[Inference for new passage]
     G --> I
-    I --> J[Predicted acoustic units or motifs]
-    J --> K[HiFi-GAN vocoder]
-    K --> L[Generated spoken pericope]
-    L --> M[Tripod Studio validator and mentor loop]
-    M --> N[Spoken Bible app delivery]
+    I --> J[Predicted motif sequence]
+    J --> J2[BPE decode]
+    J2 --> K[Discrete unit sequence]
+    K --> L[HiFi-GAN vocoder]
+    L --> M[Generated spoken pericope]
+    M --> N[Tripod Studio validator and mentor loop]
+    N --> O[Spoken Bible app delivery]
 ```
 
 ## Related RFCs
